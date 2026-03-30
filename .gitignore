@@ -16,3 +16,4 @@
 **/.terraform/
 **/.terraform/
 .DS_Store
+**/.terraform/

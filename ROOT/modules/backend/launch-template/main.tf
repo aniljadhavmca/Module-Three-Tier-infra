@@ -12,15 +12,15 @@
 #   }
 # }
 
-resource "aws_ami_from_instance" "ami_backend" {
-  name               = "backend-ami"
-  source_instance_id = var.instanceid
-  snapshot_without_reboot = false
+# resource "aws_ami_from_instance" "ami_backend" {
+#   name               = "backend-ami"
+#   # source_instance_id = var.instanceid
+#   snapshot_without_reboot = false
 
-  tags = {
-    Name = "backend-ami"
-  }
-}
+#   tags = {
+#     Name = "backend-ami"
+#   }
+# }
 
 # -----------------------
 # Backend Launch Template
@@ -28,7 +28,7 @@ resource "aws_ami_from_instance" "ami_backend" {
 resource "aws_launch_template" "backend" {
   name                   = "${var.project_name}-backend-lt"
   description            = "Backend launch template"
-  image_id               = aws_ami_from_instance.ami_backend.id
+  image_id               = var.ami
   instance_type          = var.instance_type
   vpc_security_group_ids = [var.backend_sg_id]
   key_name               = var.key_name
@@ -40,5 +40,5 @@ resource "aws_launch_template" "backend" {
       Name = "${var.project_name}-backend"
     }
   }
-  depends_on = [ aws_ami_from_instance.ami_backend ]
+  # depends_on = [ aws_ami_from_instance.ami_backend ]
 }

@@ -1,148 +1,213 @@
-# 🚀 Terraform Multi-Environment Deployment Guide
+# 🚀 Three-Tier Architecture on AWS using Terraform
 
-This project provisions a **3-tier architecture** across multiple environments using Terraform.
-
----
-
-## 📁 Environments Setup
-
-We are using **AWS named profiles** for each environment:
-
-* `dev`
-* `test`
-* `prod`
-
-### 🔧 Configure AWS Profiles
-
-Run the following commands:
-
-```bash
-aws configure --profile dev
-aws configure --profile test
-aws configure --profile prod
-```
-
-Verify configured profiles:
-
-```bash
-aws configure list-profiles
-```
+This project provisions a **production-style 3-tier architecture** on AWS using Terraform.
 
 ---
 
-## 📂 Environment Directory Structure
+## 🏗️ Architecture Overview
 
-Navigate to the respective environment before running Terraform:
+* **Frontend Tier**
 
-```bash
-cd root/env/dev    # For Dev
-cd root/env/test   # For Test
-cd root/env/prod   # For Prod
-```
+  * Application Load Balancer (ALB)
+  * Auto Scaling Group (ASG)
+  * Public Subnets
+
+* **Backend Tier**
+
+  * Internal ALB
+  * Auto Scaling Group (ASG)
+  * Private Subnets
+
+* **Database Tier**
+
+  * Amazon RDS (MySQL)
+  * Private DB Subnets
+
+* **Networking**
+
+  * Custom VPC
+  * Public + Private Subnets
+  * Internet Gateway
+  * Security Groups
 
 ---
 
-## ⚙️ Terraform Apply Flow (Step-by-Step)
+## 📁 Project Structure
 
-Apply modules **one by one in order** to avoid dependency issues:
-
-### 🏗️ Core Infrastructure
-
-```bash
-terraform apply -target=module.vpc
-terraform apply -target=module.bastion
-terraform apply -target=module.frontend-ec2
-terraform apply -target=module.backend-ec2
-terraform apply -target=module.frontend_alb
-terraform apply -target=module.backend_alb
-terraform apply -target=module.rds
+```
+.
+├── modules/
+│   ├── infrastructure/        # VPC, Subnets, Security Groups
+│   ├── frontend/
+│   │   ├── loadbalancer-frontend/
+│   │   ├── launch-template/
+│   │   └── asg/
+│   ├── backend/
+│   │   ├── loadbalancer-backend/
+│   │   ├── launch-template/
+│   │   └── asg/
+│   └── database/              # RDS
+│
+├── envs/
+│   └── dev/
+│       ├── main.tf
+│       ├── variables.tf
+│       └── dev.tfvars
 ```
 
 ---
 
-## 🔗 Application Deployment Steps
+## ⚙️ Prerequisites
 
-After infrastructure is ready:
-
-1. **Connect to EC2 Instances**
-
-   * Frontend EC2
-   * Backend EC2
-
-2. **Backend Configuration**
-
-   * Update `.env` file with:
-
-     * RDS endpoint
-     * DB credentials
-
-3. **Frontend Configuration**
-
-   * Update config file with:
-
-     * Backend Load Balancer URL
-
-4. **Deploy Applications**
-
-   * Start backend service
-   * Start frontend service
+* Terraform >= 1.3
+* AWS CLI configured
+* AWS Account
+* EC2 Key Pair (optional)
 
 ---
 
-## 🔄 Remaining Infrastructure (Auto Scaling Setup)
+## 🔑 AWS Setup
 
-Once app is verified working, apply remaining modules:
+Configure AWS credentials:
 
 ```bash
-terraform apply -target=module.frontend_launchtemplate
-terraform apply -target=module.backend_launchtemplate
-terraform apply -target=module.asg-backend
-terraform apply -target=module.asg-frontend
+aws configure
 ```
 
 ---
 
-## 📌 Notes
+## 🚀 Deployment Steps
 
-* Always apply modules **in sequence** to avoid failures.
-* Validate each step before proceeding.
-* Ensure security groups, ALB health checks, and RDS connectivity are correct.
-* Use `terraform plan` before `apply` for safety.
-
----
-
-## ✅ Recommended Workflow
+### 1️⃣ Initialize Terraform
 
 ```bash
 terraform init
-terraform plan
-terraform apply
 ```
 
 ---
 
+### 2️⃣ Validate Configuration
 
-*Comment from VEERA*
+```bash
+terraform validate
+```
 
-# Module-Three-Tier apply flow 
+---
+
+### 3️⃣ Plan Deployment
+
+```bash
+terraform plan -var-file="dev.tfvars"
 ```
-terraform apply -target=module.vpc
-terraform apply -target=module.bastion
-terraform apply -target=module.frontend-ec2
-terraform apply -target=module.backend-ec2
-terraform apply -target=module.frontend_alb
-terraform apply -target=module.backend_alb
-terraform apply -target=module.rds
+
+---
+
+### 4️⃣ Apply Infrastructure
+
+```bash
+terraform apply -var-file="dev.tfvars"
 ```
-- now connect to backend and frontend ec2s deploy the application
-- in frontend connfig file give backend loadbalncer url
-- next backend .env give rds detils 
-- next deploy both frontend and backend
-# apply reming  mmodules
+
+---
+
+### 5️⃣ Destroy Infrastructure (when needed)
+
+```bash
+terraform destroy -var-file="dev.tfvars"
 ```
-terraform apply -target=module.frontend_launchtemplate
-terraform apply -target=module.backend_launchtemplate
-terraform apply -target=module.asg-backend
-terraform apply -target=module.asg-frontend
+
+---
+
+## 🔧 Environment Configuration
+
+### dev.tfvars
 
 ```
+aws_region = "us-east-1"
+
+project_name = "three-tier-dev"
+
+vpc_name = "dev-vpc"
+vpc_cidr = "10.10.0.0/16"
+
+instance_type = "t2.micro"
+key_name      = "your-keypair-name"
+
+ami = "ami-00ca32bbc84273381"
+
+db_name     = "bookdb_dev"
+db_username = "admin"
+db_password = "********"
+```
+
+---
+
+## ⚠️ Important Notes
+
+### 🔐 Key Pair Issue
+
+If you get:
+
+```
+The key pair 'my-keypair' does not exist
+```
+
+👉 Fix by:
+
+* Using an existing key pair
+* OR creating one:
+
+```bash
+aws ec2 create-key-pair \
+  --key-name my-keypair \
+  --region us-east-1 \
+  --query 'KeyMaterial' \
+  --output text > my-keypair.pem
+```
+
+---
+
+### 🔒 Security Best Practices
+
+* Do NOT commit `.tfvars` files
+* Use AWS Secrets Manager for DB passwords
+* Restrict SSH access (`0.0.0.0/0` is unsafe)
+
+---
+
+## 📊 Terraform Workflow
+
+```
+dev.tfvars → variables.tf → main.tf → modules → AWS resources
+```
+
+---
+
+## 💡 Key Concepts Used
+
+* Terraform Modules
+* Auto Scaling Groups (ASG)
+* Launch Templates
+* Application Load Balancer (ALB)
+* VPC & Subnet Design
+* RDS (MySQL)
+
+---
+
+## 🎯 Future Improvements
+
+* ✅ S3 Remote Backend
+* ✅ DynamoDB State Locking
+* ✅ CI/CD (GitHub Actions)
+* ✅ Multi-Environment (dev/test/prod)
+* ✅ Packer AMI pipeline
+
+---
+
+## 👨‍💻 Author
+
+Anil Jadhav
+
+---
+
+## ⭐ If you found this useful, give it a star!

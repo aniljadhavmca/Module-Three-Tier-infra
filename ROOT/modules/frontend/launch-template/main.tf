@@ -13,15 +13,15 @@
 #   }
 # }
 
-resource "aws_ami_from_instance" "ami_frontend" {
-  name               = "frontend-ami"
-  source_instance_id = var.instanceid
-  snapshot_without_reboot = false
+# resource "aws_ami_from_instance" "ami_frontend" {
+#   name               = "frontend-ami"
+#   # source_instance_id = var.instanceid
+#   snapshot_without_reboot = false
 
-  tags = {
-    Name = "fronntend-ami"
-  }
-}
+#   tags = {
+#     Name = "fronntend-ami"
+#   }
+# }
 
 # -----------------------
 # Frontend Launch Template
@@ -29,7 +29,7 @@ resource "aws_ami_from_instance" "ami_frontend" {
 resource "aws_launch_template" "frontend" {
   name                   = "${var.project_name}-frontend-lt"
   description            = "Frontend launch template"
-  image_id               = aws_ami_from_instance.ami_frontend.id
+  image_id               = var.ami
   instance_type          = var.instance_type
   vpc_security_group_ids = [var.frontend_sg_id]
   key_name               = var.key_name

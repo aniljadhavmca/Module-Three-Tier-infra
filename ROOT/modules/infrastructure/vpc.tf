@@ -1,5 +1,5 @@
 # ----------------- VPC -----------------
-resource "aws_vpc" "three_tier" {
+resource "aws_vpc" "this" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
   enable_dns_support   = true
@@ -11,7 +11,7 @@ resource "aws_vpc" "three_tier" {
 
 # ----------------- Public Subnets -----------------
 resource "aws_subnet" "pub1" {
-  vpc_id                  = aws_vpc.three_tier.id
+  vpc_id                  = aws_vpc.this.id
   cidr_block              = var.public_subnet_1_cidr
   availability_zone       = var.availability_zone_1a
   map_public_ip_on_launch = true
@@ -22,7 +22,7 @@ resource "aws_subnet" "pub1" {
 }
 
 resource "aws_subnet" "pub2" {
-  vpc_id                  = aws_vpc.three_tier.id
+  vpc_id                  = aws_vpc.this.id
   cidr_block              = var.public_subnet_2_cidr
   availability_zone       = var.availability_zone_1b
   map_public_ip_on_launch = true
@@ -34,7 +34,7 @@ resource "aws_subnet" "pub2" {
 
 # ----------------- Private Web Subnets -----------------
 resource "aws_subnet" "prvt3" {
-  vpc_id            = aws_vpc.three_tier.id
+  vpc_id            = aws_vpc.this.id
   cidr_block        = var.private_subnet_1_cidr
   availability_zone = var.availability_zone_1a
 
@@ -44,7 +44,7 @@ resource "aws_subnet" "prvt3" {
 }
 
 resource "aws_subnet" "prvt4" {
-  vpc_id            = aws_vpc.three_tier.id
+  vpc_id            = aws_vpc.this.id
   cidr_block        = var.private_subnet_2_cidr
   availability_zone = var.availability_zone_1b
 
@@ -55,7 +55,7 @@ resource "aws_subnet" "prvt4" {
 
 # ----------------- Private App Subnets -----------------
 resource "aws_subnet" "prvt5" {
-  vpc_id            = aws_vpc.three_tier.id
+  vpc_id            = aws_vpc.this.id
   cidr_block        = var.private_subnet_3_cidr
   availability_zone = var.availability_zone_1a
 
@@ -65,7 +65,7 @@ resource "aws_subnet" "prvt5" {
 }
 
 resource "aws_subnet" "prvt6" {
-  vpc_id            = aws_vpc.three_tier.id
+  vpc_id            = aws_vpc.this.id
   cidr_block        = var.private_subnet_4_cidr
   availability_zone = var.availability_zone_1b
 
@@ -76,7 +76,7 @@ resource "aws_subnet" "prvt6" {
 
 # ----------------- Private DB Subnets -----------------
 resource "aws_subnet" "prvt7" {
-  vpc_id            = aws_vpc.three_tier.id
+  vpc_id            = aws_vpc.this.id
   cidr_block        = var.private_subnet_5_cidr
   availability_zone = var.availability_zone_1a
 
@@ -86,7 +86,7 @@ resource "aws_subnet" "prvt7" {
 }
 
 resource "aws_subnet" "prvt8" {
-  vpc_id            = aws_vpc.three_tier.id
+  vpc_id            = aws_vpc.this.id
   cidr_block        = var.private_subnet_6_cidr
   availability_zone = var.availability_zone_1b
 
@@ -97,7 +97,7 @@ resource "aws_subnet" "prvt8" {
 
 # ----------------- Internet Gateway -----------------
 resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.three_tier.id
+  vpc_id = aws_vpc.this.id
 
   tags = {
     Name = "${var.vpc_name}-igw"
@@ -106,7 +106,7 @@ resource "aws_internet_gateway" "igw" {
 
 # ----------------- Public Route Table -----------------
 resource "aws_route_table" "public_rt" {
-  vpc_id = aws_vpc.three_tier.id
+  vpc_id = aws_vpc.this.id
 
   tags = {
     Name = "${var.vpc_name}-public-rt"
@@ -143,7 +143,7 @@ resource "aws_nat_gateway" "nat" {
 
 # ----------------- Private Route Table -----------------
 resource "aws_route_table" "private_rt" {
-  vpc_id = aws_vpc.three_tier.id
+  vpc_id = aws_vpc.this.id
 
   tags = {
     Name = "${var.vpc_name}-private-rt"

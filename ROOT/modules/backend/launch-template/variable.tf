@@ -32,7 +32,7 @@ variable "key_name" {
   type        = string
 }
 
-variable "instanceid" {
-  description = "Source instance ID for creating AMI"
+variable "ami" {
+  description = "AMI ID"
   type        = string
 }

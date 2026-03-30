@@ -1,5 +1,5 @@
 output "vpc_id" {
-  value = aws_vpc.three_tier.id
+  value = aws_vpc.this.id
 }
 
 output "public_subnets" {

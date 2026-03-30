@@ -1,0 +1,21 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "AllowTestResources",
+        "Effect": "Allow",
+        "Action": [
+          "ec2:*",
+          "autoscaling:*",
+          "elasticloadbalancing:*",
+          "rds:*"
+        ],
+        "Resource": [
+          "arn:aws:ec2:*:*:instance/*",
+          "arn:aws:autoscaling:*:*:autoScalingGroup:*:autoScalingGroupName/three-tier-test-*",
+          "arn:aws:elasticloadbalancing:*:*:loadbalancer/app/three-tier-test-*/*",
+          "arn:aws:rds:*:*:db:three-tier-test-*"
+        ]
+      }
+    ]
+  }

@@ -1,0 +1,27 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "AllowReadAll",
+        "Effect": "Allow",
+        "Action": [
+          "ec2:Describe*",
+          "autoscaling:Describe*",
+          "elasticloadbalancing:Describe*",
+          "rds:Describe*"
+        ],
+        "Resource": "*"
+      },
+      {
+        "Sid": "AllowDevActions",
+        "Effect": "Allow",
+        "Action": [
+          "ec2:*",
+          "autoscaling:*",
+          "elasticloadbalancing:*",
+          "rds:*"
+        ],
+        "Resource": "*"
+      }
+    ]
+  }
